@@ -7,7 +7,14 @@ var addedVideos = new Set();
 var currentVideo = -1;
 
 searchInput.onkeyup = (e) => {
-  if(e.keyCode == 13 && searchInput.value) // Enter key
+  if(e.keyCode == 13 && searchInput.value) // "Enter" key
+  {
+    searchVideo(searchInput.value);
+  }
+}
+
+generateInput.onkeyup = (e) => {
+  if(e.keyCode == 13 && searchInput.value) // "Enter" key
   {
     searchVideo(searchInput.value);
   }
