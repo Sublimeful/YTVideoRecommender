@@ -5,26 +5,29 @@ const playlist = document.getElementById("playlist")
 var queue = [];
 var played = new Set();
 var currentVideo = -1;
-var canSearchVideo = true;
 
 searchInput.onkeyup = (e) => {
-  if(e.keyCode == 13 && canSearchVideo) // Enter key
+  if(e.keyCode == 13 && searchInput.value) // Enter key
   {
     searchVideo(searchInput.value);
   }
 }
 
 function onPlayerStateChange(event) { //when video finishes
-  if(event.state == 0)
+  if(event.data == 0)
   {
-    if(currentVideo < queue.length)
+    if(currentVideo < queue.length && currentVideo >= 0) //check if currentVideo is in bounds
     {
+      playVideo(queue[currentVideo]);
+    }
+    else if(queue.length > 0) //checks if queue even has something
+    {
+      currentVideo = 0;
       playVideo(queue[currentVideo]);
     }
     else
     {
-      currentVideo = 0;
-      playVideo(queue[currentVideo]);
+      currentVideo = -1;
     }
   }
 }
@@ -112,7 +115,7 @@ function searchVideo(url)
     video.videoId = match[0];
     generateVideos(video);
 
-    searchInput.style.display = "none";
-    canSearchVideo = false;
+    player.loadVideoById(video.videoId);
+    player.playVideo();
   }
 }
