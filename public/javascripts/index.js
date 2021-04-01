@@ -3,7 +3,7 @@ const generateInput = document.getElementById("input-generate");
 const playlist = document.getElementById("playlist");
 
 var queue = [];
-var played = new Set();
+var addedVideos = new Set();
 var currentVideo = -1;
 
 searchInput.onkeyup = (e) => {
@@ -43,9 +43,7 @@ function playVideo(video)
   player.loadVideoById(video.videoId);
   player.playVideo(); //play the video
 
-  played.add(video); //add to played and then generate video (order is important)
-
-  generateVideos(video);
+  generateVideos(video); //generates new videos
 }
 
 function removeVideoFromPlaylist(index)
@@ -69,10 +67,12 @@ function generateVideos(video) //generate videos from video
                                                                            //returned array(otherwise out of bounds)
     for(var i = 0; i < min; i++)
     {
-      if(!played.has(json[i])) //if video hasnt been played before
+      var video = json[i];
+      if(!addedVideos.has(video.videoId)) //if video hasnt been added before
       {
-        addVideoToPlaylist(json[i]);
-        queue.push(json[i]); //add to playlist
+        addedVideos.add(video.videoId); //add videoID to added videos
+        addVideoToPlaylist(video);
+        queue.push(video); //add to playlist
       }
     }
   })
@@ -117,9 +117,11 @@ function searchVideo(url)
       videoThumb: ""
     };
     video.videoId = match[0]; //match[0] is id of video, because im smart
-    generateVideos(video);    //generate videos using just created video object
+    addedVideos.add(video.videoId);//add videoID to added videos (order is important)
 
     player.loadVideoById(video.videoId); //play video
     player.playVideo();
+
+    generateVideos(video);    //generate videos using just created video object
   }
 }
