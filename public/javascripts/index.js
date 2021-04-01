@@ -1,4 +1,5 @@
-const input = document.getElementById("input");
+const searchInput = document.getElementById("input-search");
+const generateInput = document.getElementById("input-generate");
 const playlist = document.getElementById("playlist")
 
 var queue = [];
@@ -6,10 +7,10 @@ var played = new Set();
 var currentVideo = -1;
 var canSearchVideo = true;
 
-input.onkeyup = (e) => {
+searchInput.onkeyup = (e) => {
   if(e.keyCode == 13 && canSearchVideo) // Enter key
   {
-    searchVideo(input.value);
+    searchVideo(searchInput.value);
   }
 }
 
@@ -56,7 +57,10 @@ function generateVideos(video) //generate videos from video
     return res.json();
   })
   .then((json) => {
-    for(var i = 0; i < json.length; i++)
+    var generateNumber = generateInput.value ? parseInt(generateInput.value) : 5;
+    var min = generateNumber < json.length ? generateNumber : json.length;
+
+    for(var i = 0; i < min; i++)
     {
       if(!played.has(json[i])) //if video hasnt been played before
       {
@@ -94,7 +98,7 @@ function addVideoToPlaylist(video)
 
 function searchVideo(url)
 {
-  input.value = ""; //clear input
+  searchInput.value = ""; //clear input
   const videoRegex = /(?<=^(https?\:\/\/)?(www.)?(youtube\.com\/watch\?v=|youtube\.com\/|youtu\.be\/))[A-z0-9_-]{11}/;
   var match;
   if(match = url.match(videoRegex))
@@ -108,6 +112,7 @@ function searchVideo(url)
     video.videoId = match[0];
     generateVideos(video);
 
-    input.style.display = "none";
+    searchInput.style.display = "none";
+    canSearchVideo = false;
   }
 }

@@ -4,20 +4,23 @@
   height: 100vh;
   background-color: #424242;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
 }
-#input
+#inputs
 {
-  position: absolute;
-  align-self: flex-end;
-  margin-bottom: 10px;
-  bottom: 10px;
+  display: flex; 
+  flex-direction: column;
+}
+#inputs input
+{
   border-radius: 25px;
   border: none;
   height: 30px;
   width: 256px;
   text-align: center;
   outline: none;
+  margin-top: 10px;
 }
 #playlist
 {
