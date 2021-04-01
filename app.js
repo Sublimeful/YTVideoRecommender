@@ -1,18 +1,20 @@
 const express = require("express");
+const favicon = require('serve-favicon');
 const puppeteer = require("puppeteer"); //using puppeteer, use puppeteer-core if you want
 const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + 'public'));
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 /*
   delay function (will be useful later on)
 */
 function delay(time) {
   return new Promise(function(resolve) { 
-    setTimeout(resolve, time)
+    setTimeout(resolve, time);
   });
 }
 
@@ -68,7 +70,7 @@ async function getRecommendedVideosFromVideo(videoId)
 }
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '/index.html'))
+  res.sendFile(path.join(__dirname, '/index.html'));
 })
 
 app.get('/get_recommended_videos/:videoId', async (req, res) => {

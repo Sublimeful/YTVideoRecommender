@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "express": "^4.17.1",
-    "puppeteer": "^8.0.0"
+    "puppeteer": "^8.0.0",
+    "serve-favicon": "^2.5.0"
   },
   "name": "ytvideorecommender",
   "version": "1.0.0",
