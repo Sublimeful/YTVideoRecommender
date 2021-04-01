@@ -1,6 +1,6 @@
 const searchInput = document.getElementById("input-search");
 const generateInput = document.getElementById("input-generate");
-const playlist = document.getElementById("playlist")
+const playlist = document.getElementById("playlist");
 
 var queue = [];
 var played = new Set();
@@ -35,15 +35,15 @@ function onPlayerStateChange(event) { //when video finishes
 function playVideo(video)
 {
   var index = queue.indexOf(video);
-  currentVideo = index;
+  currentVideo = index; //gets index and sets currentVideo
 
   removeVideoFromPlaylist(index);
-  queue.splice(index, 1);
+  queue.splice(index, 1); //remove from playlist
 
   player.loadVideoById(video.videoId);
-  player.playVideo();
+  player.playVideo(); //play the video
 
-  played.add(video);
+  played.add(video); //add to played and then generate video (order is important)
 
   generateVideos(video);
 }
@@ -55,20 +55,24 @@ function removeVideoFromPlaylist(index)
 
 function generateVideos(video) //generate videos from video
 {
-  fetch(`/get_videos/${video.videoId}`)
+  var generateNumber = generateInput.value ? parseInt(generateInput.value) : 5; //gets gennumber from input
+                                                                                //and checks to see if valid number
+                                                                                //if not valid then default to 5
+  if(generateNumber <= 0) return; //no point if generateNumber is 0 or lower, dont waste my resources
+
+  fetch(`/get_recommended_videos/${video.videoId}`)
   .then((res) => {
     return res.json();
   })
   .then((json) => {
-    var generateNumber = generateInput.value ? parseInt(generateInput.value) : 5;
-    var min = generateNumber < json.length ? generateNumber : json.length;
-
+    var min = generateNumber < json.length ? generateNumber : json.length; //gets the min between gennumber and 
+                                                                           //returned array(otherwise out of bounds)
     for(var i = 0; i < min; i++)
     {
       if(!played.has(json[i])) //if video hasnt been played before
       {
         addVideoToPlaylist(json[i]);
-        queue.push(json[i]);
+        queue.push(json[i]); //add to playlist
       }
     }
   })
@@ -104,7 +108,7 @@ function searchVideo(url)
   searchInput.value = ""; //clear input
   const videoRegex = /(?<=^(https?\:\/\/)?(www.)?(youtube\.com\/watch\?v=|youtube\.com\/|youtu\.be\/))[A-z0-9_-]{11}/;
   var match;
-  if(match = url.match(videoRegex))
+  if(match = url.match(videoRegex)) //checks whether url even matches regex
   {
     var video = {
       videoId: "",
@@ -112,10 +116,10 @@ function searchVideo(url)
       videoUrl: "",
       videoThumb: ""
     };
-    video.videoId = match[0];
-    generateVideos(video);
+    video.videoId = match[0]; //match[0] is id of video, because im smart
+    generateVideos(video);    //generate videos using just created video object
 
-    player.loadVideoById(video.videoId);
+    player.loadVideoById(video.videoId); //play video
     player.playVideo();
   }
 }
