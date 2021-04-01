@@ -3,7 +3,7 @@ const puppeteer = require("puppeteer"); //using puppeteer, use puppeteer-core if
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(express.static(__dirname + '/public'));
 
@@ -78,7 +78,7 @@ app.get('/get_recommended_videos/:videoId', async (req, res) => {
 })
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`🔥 server is listening on port ${port}!`);
 })
 
 
