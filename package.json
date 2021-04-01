@@ -2,5 +2,23 @@
   "dependencies": {
     "express": "^4.17.1",
     "puppeteer": "^8.0.0"
-  }
+  },
+  "name": "ytvideorecommender",
+  "version": "1.0.0",
+  "description": "Youtube video recommender, cool right?",
+  "main": "app.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sublimeful/YTVideoRecommender.git"
+  },
+  "author": "Sublimeful",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Sublimeful/YTVideoRecommender/issues"
+  },
+  "homepage": "https://github.com/Sublimeful/YTVideoRecommender#readme"
 }
