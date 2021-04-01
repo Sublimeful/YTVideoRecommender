@@ -1,13 +1,11 @@
 const express = require("express");
-const favicon = require('serve-favicon');
 const puppeteer = require("puppeteer"); //using puppeteer, use puppeteer-core if you want
 const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.static(__dirname + 'public'));
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 /*
   delay function (will be useful later on)
