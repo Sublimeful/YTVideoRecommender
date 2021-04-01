@@ -9,12 +9,16 @@ if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''
 endif
 set shortmess=aoO
 badd +7 Server.py
-badd +57 app.js
+badd +1 app.js
 badd +1 package.json
-badd +20 public/stylesheets/style.css
-badd +0 public/javascripts/index.js
+badd +25 public/stylesheets/style.css
+badd +59 public/javascripts/index.js
+badd +13 public/index.html
+badd +0 .gitignore
 argglobal
 %argdel
+tabnew
+tabnew
 tabnew
 tabrewind
 edit app.js
@@ -36,12 +40,12 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 57 - ((5 * winheight(0) + 18) / 37)
+let s:l = 72 - ((26 * winheight(0) + 18) / 37)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 57
-normal! 0269|
+keepjumps 72
+normal! 0
 lcd ~/Desktop/Scrapy\ Scrapy\ Nigg
 tabnext
 edit ~/Desktop/Scrapy\ Scrapy\ Nigg/public/stylesheets/style.css
@@ -62,14 +66,68 @@ setlocal fdl=0
 setlocal fml=1
 setlocal fdn=20
 setlocal fen
-let s:l = 20 - ((19 * winheight(0) + 18) / 37)
+let s:l = 37 - ((36 * winheight(0) + 18) / 37)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 20
-normal! 015|
+keepjumps 37
+normal! 0
 lcd ~/Desktop/Scrapy\ Scrapy\ Nigg
-tabnext 2
+tabnext
+edit ~/Desktop/Scrapy\ Scrapy\ Nigg/public/javascripts/index.js
+set splitbelow splitright
+set nosplitbelow
+set nosplitright
+wincmd t
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+argglobal
+balt C:/
+setlocal fdm=marker
+setlocal fde=0
+setlocal fmr=<--,-->
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+let s:l = 17 - ((16 * winheight(0) + 18) / 37)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 17
+normal! 0
+lcd ~/Desktop/Scrapy\ Scrapy\ Nigg
+tabnext
+edit ~/Desktop/Scrapy\ Scrapy\ Nigg/public/index.html
+set splitbelow splitright
+set nosplitbelow
+set nosplitright
+wincmd t
+set winminheight=0
+set winheight=1
+set winminwidth=0
+set winwidth=1
+argglobal
+balt ~/Desktop/Scrapy\ Scrapy\ Nigg/public/index.html
+setlocal fdm=marker
+setlocal fde=0
+setlocal fmr=<--,-->
+setlocal fdi=#
+setlocal fdl=0
+setlocal fml=1
+setlocal fdn=20
+setlocal fen
+let s:l = 16 - ((15 * winheight(0) + 18) / 37)
+if s:l < 1 | let s:l = 1 | endif
+keepjumps exe s:l
+normal! zt
+keepjumps 16
+normal! 0
+lcd ~/Desktop/Scrapy\ Scrapy\ Nigg
+tabnext 3
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0&& getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf
 endif
@@ -80,7 +138,6 @@ if filereadable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &g:so = s:so_save | let &g:siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :
