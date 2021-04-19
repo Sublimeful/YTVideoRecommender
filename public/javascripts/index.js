@@ -6,43 +6,49 @@ const searchAutoPlay = document.getElementById("search-autoplay")
 var queue = [];
 var addedVideos = new Set();
 var currentVideo = -1;
-var enqueuedVideo = -1;
+var enqueuedVideos = [];
 
-searchInput.onkeyup = (e) => {
-  if(e.keyCode == 13 && searchInput.value) // "Enter" key
+searchInput.onkeyup = event => {
+  if(event.code == "Enter" && searchInput.value)
   {
     searchVideo(searchInput.value);
   }
 }
 
-generateInput.onkeyup = (e) => {
-  if(e.keyCode == 13 && searchInput.value) // "Enter" key
+generateInput.onkeyup = event => {
+  if(event.code == "Enter" && searchInput.value)
   {
     searchVideo(searchInput.value);
   }
 }
 
-function onPlayerStateChange(event) { //when video finishes
+function onPlayerStateChange(event) {
   if(event.data == 0)
   {
-    //plays enqueuedVideo if there is one
-    if(enqueuedVideo != -1) {
-      playVideo(queue[enqueuedVideo]);
-      enqueuedVideo = -1;
+    //when video finishes
+    //plays first enqueuedVideo if there is one
+    if(enqueuedVideos.length > 0) {
+      playVideo(enqueuedVideos.shift());
       return;
     }
 
-    if(currentVideo < queue.length && currentVideo >= 0) //check if currentVideo is in bounds
+    if(currentVideo < queue.length && currentVideo >= 0)
     {
+      //check if currentVideo is in bounds
+      //if it is then play currentVideo
       playVideo(queue[currentVideo]);
     }
-    else if(queue.length > 0) //checks if queue even has something
+    else if(queue.length > 0)
     {
+      //checks if queue even has something
+      //if it does then play the first video
       currentVideo = 0;
       playVideo(queue[currentVideo]);
     }
     else
     {
+      //otherwise dont play anything
+      //set currentVideo to -1
       currentVideo = -1;
     }
   }
@@ -50,65 +56,95 @@ function onPlayerStateChange(event) { //when video finishes
 
 function updateBorder()
 {
+  //remove all the borders from the playlist
   for(var i = 0; i < playlist.children.length; i++)
     playlist.children[i].style.border = "";
-
-  //colors the enqueuedVideo if there is one
-  if(playlist.children[enqueuedVideo])
-    playlist.children[enqueuedVideo].style.border = "2px solid green";
 
   //indicate currentVideo
   if(currentVideo == -1 || currentVideo >= playlist.children.length)
     playlist.children[0].style.border = "2px solid red";
   else if(currentVideo >= 0 && currentVideo < playlist.children.length)
     playlist.children[currentVideo].style.border = "2px solid red";
+
+  //colors the enqueuedVideos
+  for(var i = 0; i < enqueuedVideos.length; i++)
+  {
+    const video = enqueuedVideos[i];
+    const index = queue.indexOf(video);
+    const hue = 30 * i % 360;
+    if(playlist.children[index]) {
+      playlist.children[index].style.border = `2px solid hsl(${hue}, 50%, 50%)`;
+    }
+  }
 }
 
 function playVideo(video)
 {
+  //gets index and sets currentVideo
   var index = queue.indexOf(video);
-  currentVideo = index; //gets index and sets currentVideo
+  currentVideo = index;
 
+  //remove from playlist and queue
   removeVideoFromPlaylist(index);
-  queue.splice(index, 1); //remove from playlist
+  queue.splice(index, 1);
 
+  //play the video
   player.loadVideoById(video.videoId);
-  player.playVideo(); //play the video
+  player.playVideo();
 
-  generateVideos(video); //generates new videos
+  //generates new videos
+  generateVideos(video);
+}
+
+function removeVideoFromPlaylist(index)
+{
+  //remove the video if it is within range
+  if(index >= 0 && index < playlist.children.length)
+    playlist.children[index].remove();
 
   //update the border afterwards
   updateBorder();
 }
 
-function removeVideoFromPlaylist(index)
+function deleteVideo(video)
 {
-  if(index >= 0 && index < playlist.children.length)
-    playlist.children[index].remove();
+  //get index
+  const index = queue.indexOf(video);
+
+  //delete a video from the queue and the playlist
+  queue.splice(index, 1);
+  removeVideoFromPlaylist(index);
 }
 
-function generateVideos(video) //generate videos from video
+function generateVideos(video)
 {
-  var generateNumber = generateInput.value ? parseInt(generateInput.value) : 5; //gets gennumber from input
-                                                                                //and checks to see if valid number
-                                                                                //if not valid then default to 5
-  if(generateNumber <= 0) return; //no point if generateNumber is 0 or lower, dont waste my resources
+  //generate videos from video
+
+  //gets gennumber from input and checks to see if valid number
+  //if not valid then default to 5
+  var generateNumber = generateInput.value ? parseInt(generateInput.value) : 5;
+
+  //no point if generateNumber is 0 or lower, dont waste my resources
+  if(generateNumber <= 0) return; 
 
   fetch(`/get_recommended_videos/${video.videoId}`)
-  .then((res) => {
-    return res.json();
-  })
-  .then((json) => {
-    var min = generateNumber < json.length ? generateNumber : json.length; //gets the min between gennumber and 
-                                                                           //returned array(otherwise out of bounds)
+  .then(res => res.json())
+  .then(json => {
+    //gets the min between gennumber and returned array(otherwise out of bounds)
+    var min = generateNumber < json.length ? generateNumber : json.length;
+
     for(var i = 0; i < min; i++)
     {
       var video = json[i];
-      if(!addedVideos.has(video.videoId)) //if video hasnt been added before
+      if(!addedVideos.has(video.videoId))
       {
-        addedVideos.add(video.videoId); //add videoID to added videos
+        //if video hasnt been added before
+        //add videoID to added videos
+        addedVideos.add(video.videoId); 
         addVideoToPlaylist(video);
-        queue.push(video); //add to playlist
+
+        //add to playlist
+        queue.push(video); 
       }
     }
 
@@ -125,7 +161,13 @@ function enqueueVideo(video)
   //stop if the index is equal to currentVideo, because that dont make sense
   if(index == currentVideo) return;
 
-  enqueuedVideo = index;
+  if(enqueuedVideos.includes(video)) {
+    //remove the video from enqueuedVideos
+    enqueuedVideos.splice(enqueuedVideos.indexOf(video), 1);
+  } else {
+    //push the video into enqueuedVideos
+    enqueuedVideos.push(video);
+  }
 
   //update the border afterwards
   updateBorder();
@@ -155,13 +197,22 @@ function addVideoToPlaylist(video)
   videoEl.appendChild(thumbEl);
   videoEl.appendChild(titleEl);
 
-  //if the mouse is over the videoEl and user presses E
-  //then it will enqueue the video that was moused over to play next
+  //mouseover keydown event
   var isMouseOver = false;
   
   document.addEventListener("keydown", event => {
-    if(!isMouseOver) return;
-    if(event.code == "KeyE") enqueueVideo(video);
+    if(!isMouseOver || document.activeElement == generateInput
+                    || document.activeElement == searchInput) return;
+    switch(event.code) {
+      case "KeyE":
+        //enqueue video
+        enqueueVideo(video);
+        break;
+      case "KeyD":
+        //delete video
+        deleteVideo(video);
+        break;
+    }
   })
   videoEl.addEventListener("mouseenter", () => {
     isMouseOver = true;
@@ -173,27 +224,36 @@ function addVideoToPlaylist(video)
 
 function searchVideo(url)
 {
-  searchInput.value = ""; //clear input
+  //clear input
+  searchInput.value = "";
+
   const videoRegex = /(?<=^(https?\:\/\/)?(www.)?(youtube\.com\/watch\?v=|youtube\.com\/|youtu\.be\/))[A-z0-9_-]{11}/;
-  var match;
-  if(match = url.match(videoRegex)) //checks whether url even matches regex
+  const match = url.match(videoRegex);
+
+  if(match)
   {
+    //checks whether url even matches regex
     var video = {
       videoId: "",
       videoTitle: "",
       videoUrl: "",
       videoThumb: ""
     };
-    video.videoId = match[0]; //match[0] is id of video, because im smart
+
+    //match[0] is id of video, because im smart
+    video.videoId = match[0];
 
     //if searchAutoPlay is checked, then autoplay the video
     if(searchAutoPlay.checked) {
-      addedVideos.add(video.videoId);//add videoID to added videos (order is important)
+      //add videoID to added videos (order is important)
+      addedVideos.add(video.videoId);
 
-      player.loadVideoById(video.videoId); //play video
+      //play video
+      player.loadVideoById(video.videoId);
       player.playVideo();
     }
 
-    generateVideos(video);    //generate videos using just created video object
+    //generate videos using just created video object
+    generateVideos(video);
   }
 }
