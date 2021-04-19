@@ -126,6 +126,8 @@ function enqueueVideo(video)
   if(index == currentVideo) return;
 
   enqueuedVideo = index;
+
+  //update the border afterwards
   updateBorder();
 }
 
