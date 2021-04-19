@@ -1,10 +1,12 @@
 const searchInput = document.getElementById("input-search");
 const generateInput = document.getElementById("input-generate");
 const playlist = document.getElementById("playlist");
+const searchAutoPlay = document.getElementById("search-autoplay")
 
 var queue = [];
 var addedVideos = new Set();
 var currentVideo = -1;
+var enqueuedVideo = -1;
 
 searchInput.onkeyup = (e) => {
   if(e.keyCode == 13 && searchInput.value) // "Enter" key
@@ -23,6 +25,13 @@ generateInput.onkeyup = (e) => {
 function onPlayerStateChange(event) { //when video finishes
   if(event.data == 0)
   {
+    //plays enqueuedVideo if there is one
+    if(enqueuedVideo != -1) {
+      playVideo(queue[enqueuedVideo]);
+      enqueuedVideo = -1;
+      return;
+    }
+
     if(currentVideo < queue.length && currentVideo >= 0) //check if currentVideo is in bounds
     {
       playVideo(queue[currentVideo]);
@@ -39,6 +48,22 @@ function onPlayerStateChange(event) { //when video finishes
   }
 }
 
+function updateBorder()
+{
+  for(var i = 0; i < playlist.children.length; i++)
+    playlist.children[i].style.border = "";
+
+  //colors the enqueuedVideo if there is one
+  if(playlist.children[enqueuedVideo])
+    playlist.children[enqueuedVideo].style.border = "2px solid green";
+
+  //indicate currentVideo
+  if(currentVideo == -1 || currentVideo >= playlist.children.length)
+    playlist.children[0].style.border = "2px solid red";
+  else if(currentVideo >= 0 && currentVideo < playlist.children.length)
+    playlist.children[currentVideo].style.border = "2px solid red";
+}
+
 function playVideo(video)
 {
   var index = queue.indexOf(video);
@@ -51,11 +76,15 @@ function playVideo(video)
   player.playVideo(); //play the video
 
   generateVideos(video); //generates new videos
+
+  //update the border afterwards
+  updateBorder();
 }
 
 function removeVideoFromPlaylist(index)
 {
-  playlist.children[index].remove();
+  if(index >= 0 && index < playlist.children.length)
+    playlist.children[index].remove();
 }
 
 function generateVideos(video) //generate videos from video
@@ -82,7 +111,22 @@ function generateVideos(video) //generate videos from video
         queue.push(video); //add to playlist
       }
     }
+
+    //update the border afterwards
+    updateBorder();
   })
+}
+
+function enqueueVideo(video)
+{
+  //sets the enqueuedVideo to the video's index and updates border
+  const index = queue.indexOf(video);
+
+  //stop if the index is equal to currentVideo, because that dont make sense
+  if(index == currentVideo) return;
+
+  enqueuedVideo = index;
+  updateBorder();
 }
 
 function addVideoToPlaylist(video)
@@ -108,6 +152,21 @@ function addVideoToPlaylist(video)
   playlistEl.appendChild(videoEl);
   videoEl.appendChild(thumbEl);
   videoEl.appendChild(titleEl);
+
+  //if the mouse is over the videoEl and user presses E
+  //then it will enqueue the video that was moused over to play next
+  var isMouseOver = false;
+  
+  document.addEventListener("keydown", event => {
+    if(!isMouseOver) return;
+    if(event.code == "KeyE") enqueueVideo(video);
+  })
+  videoEl.addEventListener("mouseenter", () => {
+    isMouseOver = true;
+  })
+  videoEl.addEventListener("mouseleave", () => {
+    isMouseOver = false;
+  })
 }
 
 function searchVideo(url)
@@ -124,10 +183,14 @@ function searchVideo(url)
       videoThumb: ""
     };
     video.videoId = match[0]; //match[0] is id of video, because im smart
-    addedVideos.add(video.videoId);//add videoID to added videos (order is important)
 
-    player.loadVideoById(video.videoId); //play video
-    player.playVideo();
+    //if searchAutoPlay is checked, then autoplay the video
+    if(searchAutoPlay.checked) {
+      addedVideos.add(video.videoId);//add videoID to added videos (order is important)
+
+      player.loadVideoById(video.videoId); //play video
+      player.playVideo();
+    }
 
     generateVideos(video);    //generate videos using just created video object
   }

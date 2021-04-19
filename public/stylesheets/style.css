@@ -12,7 +12,7 @@
   display: flex; 
   flex-direction: column;
 }
-#inputs input
+#inputs input[type="text"]
 {
   border-radius: 25px;
   border: none;
