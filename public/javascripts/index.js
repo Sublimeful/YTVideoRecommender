@@ -197,9 +197,12 @@ function addVideoToPlaylist(video)
   const linkEl = document.createElement("a");
   linkEl.href = videoUrl;
   linkEl.textContent = videoTitle;
-  linkEl.style.pointerEvents = "none";
-  linkEl.style.color = "";
-  linkEl.style.textDecoration = "";
+  linkEl.style.textDecoration = "none";
+  linkEl.style.color = "inherit";
+  linkEl.addEventListener("click", event => {
+    //preventDefault as to not redirect to link on click
+    event.preventDefault();
+  })
 
   playlistEl.appendChild(videoEl);
   videoEl.appendChild(thumbEl);
