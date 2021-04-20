@@ -7,6 +7,7 @@ var queue = [];
 var addedVideos = new Set();
 var currentVideo = -1;
 var enqueuedVideos = [];
+var mouseOver = null;
 
 searchInput.onkeyup = event => {
   if(event.code == "Enter" && searchInput.value)
@@ -128,19 +129,19 @@ function generateVideos(video)
   .then(res => res.json())
   .then(json => {
     //gets the min between gennumber and returned array(otherwise out of bounds)
-    var min = generateNumber < json.length ? generateNumber : json.length;
+    const min = generateNumber < json.length ? generateNumber : json.length;
 
     for(var i = 0; i < min; i++)
     {
-      var video = json[i];
+      const video = json[i];
+
       if(!addedVideos.has(video.videoId))
       {
-        //if video hasnt been added before
-        //add videoID to added videos
+        //if video hasnt been added before then add videoID to added videos
         addedVideos.add(video.videoId); 
-        addVideoToPlaylist(video);
 
-        //add to playlist
+        //add to playlist and queue
+        addVideoToPlaylist(video);
         queue.push(video); 
       }
     }
@@ -190,28 +191,12 @@ function addVideoToPlaylist(video)
   videoEl.appendChild(thumbEl);
   videoEl.appendChild(titleEl);
 
-  //mouseover keydown event
-  var isMouseOver = false;
-  
-  document.addEventListener("keydown", event => {
-    if(!isMouseOver || document.activeElement == generateInput
-                    || document.activeElement == searchInput) return;
-    switch(event.code) {
-      case "KeyE":
-        //enqueue video
-        enqueueVideo(video);
-        break;
-      case "KeyD":
-        //delete video
-        deleteVideo(video);
-        break;
-    }
-  })
+  //mouseover event
   videoEl.addEventListener("mouseenter", () => {
-    isMouseOver = true;
+    mouseOver = video;
   })
   videoEl.addEventListener("mouseleave", () => {
-    isMouseOver = false;
+    mouseOver = null;
   })
 }
 
@@ -250,3 +235,19 @@ function searchVideo(url)
     generateVideos(video);
   }
 }
+
+//document key mouse over event
+document.addEventListener("keydown", event => {
+  if(!mouseOver || document.activeElement == generateInput
+                || document.activeElement == searchInput) return;
+  switch(event.code) {
+    case "KeyE":
+      //enqueue video
+      enqueueVideo(mouseOver);
+      break;
+    case "KeyD":
+      //delete video
+      deleteVideo(mouseOver);
+      break;
+  }
+})
