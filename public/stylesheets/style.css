@@ -55,6 +55,8 @@
   position: absolute;
   top: 0;
   left: 0;
+  resize: both;
+  border: 1px solid #d3d3d3;
 }
 body
 {
