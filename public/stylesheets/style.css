@@ -30,6 +30,7 @@
   border-style: solid;
   border-color: black;
   overflow-y: scroll;
+  overflow-x: hidden;
 }
 .playlist-item
 {
