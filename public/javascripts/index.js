@@ -192,22 +192,20 @@ function addVideoToPlaylist(video)
 
   const titleEl = document.createElement("h1");
   titleEl.className = "video-title";
+  titleEl.textContent = videoTitle;
   titleEl.onclick = () => playVideo(video); 
 
   const linkEl = document.createElement("a");
   linkEl.href = videoUrl;
-  linkEl.textContent = videoTitle;
-  linkEl.style.textDecoration = "none";
-  linkEl.style.color = "inherit";
   linkEl.addEventListener("click", event => {
     //preventDefault as to not redirect to link on click
     event.preventDefault();
   })
 
   playlistEl.appendChild(videoEl);
-  videoEl.appendChild(thumbEl);
+  linkEl.appendChild(thumbEl);
+  videoEl.appendChild(linkEl);
   videoEl.appendChild(titleEl);
-  titleEl.appendChild(linkEl);
 
   //mouseover event
   videoEl.addEventListener("mouseenter", () => {
