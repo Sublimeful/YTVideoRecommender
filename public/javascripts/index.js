@@ -54,17 +54,23 @@ function onPlayerStateChange(event) {
   }
 }
 
-function updateBorder()
+function updateIndicators()
 {
   //remove all the borders from the playlist
-  for(var i = 0; i < playlist.children.length; i++)
+  for(var i = 0; i < playlist.children.length; i++) {
     playlist.children[i].style.border = "";
+    playlist.children[i].style.backgroundColor = "";
+  }
 
   //indicate currentVideo
-  if(currentVideo == -1 || currentVideo >= playlist.children.length)
+  if(currentVideo == -1 || currentVideo >= playlist.children.length) {
     playlist.children[0].style.border = "2px solid red";
-  else if(currentVideo >= 0 && currentVideo < playlist.children.length)
+    playlist.children[0].style.backgroundColor = "red";
+  }
+  else if(currentVideo >= 0 && currentVideo < playlist.children.length) {
     playlist.children[currentVideo].style.border = "2px solid red";
+    playlist.children[currentVideo].style.backgroundColor = "red";
+  }
 
   //colors the enqueuedVideos
   for(var i = 0; i < enqueuedVideos.length; i++)
@@ -74,6 +80,7 @@ function updateBorder()
     const index = queue.indexOf(video);
     if(playlist.children[index]) {
       playlist.children[index].style.border = `2px solid hsl(${hue}, 50%, 50%)`;
+      playlist.children[index].style.backgroundColor = `2px solid hsl(${hue}, 50%, 50%)`;
     }
   }
 }
@@ -110,8 +117,8 @@ function deleteVideo(video)
   //delete from queue
   queue.splice(index, 1);
 
-  //update the border afterwards
-  updateBorder();
+  //update the indicators afterwards
+  updateIndicators();
 }
 
 function generateVideos(video)
@@ -146,8 +153,8 @@ function generateVideos(video)
       }
     }
 
-    //update the border afterwards
-    updateBorder();
+    //update the indicators afterwards
+    updateIndicators();
   })
 }
 
@@ -163,8 +170,8 @@ function enqueueVideo(video)
     enqueuedVideos.push(video);
   }
 
-  //update the border afterwards
-  updateBorder();
+  //update the indicators afterwards
+  updateIndicators();
 }
 
 function addVideoToPlaylist(video)
