@@ -64,12 +64,12 @@ function updateIndicators()
 
   //indicate currentVideo
   if(currentVideo == -1 || currentVideo >= playlist.children.length) {
-    playlist.children[0].style.border = "2px solid red";
-    playlist.children[0].style.backgroundColor = "red";
+    playlist.children[0].style.border = "2px solid white";
+    playlist.children[0].style.backgroundColor = "white";
   }
   else if(currentVideo >= 0 && currentVideo < playlist.children.length) {
-    playlist.children[currentVideo].style.border = "2px solid red";
-    playlist.children[currentVideo].style.backgroundColor = "red";
+    playlist.children[currentVideo].style.border = "2px solid white";
+    playlist.children[currentVideo].style.backgroundColor = "white";
   }
 
   //colors the enqueuedVideos
