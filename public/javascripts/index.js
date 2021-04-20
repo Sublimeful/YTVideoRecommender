@@ -94,6 +94,9 @@ function playVideo(video)
 
   //generates new videos
   generateVideos(video);
+
+  //update the border afterwards
+  updateBorder();
 }
 
 function removeVideoFromPlaylist(index)
@@ -101,19 +104,20 @@ function removeVideoFromPlaylist(index)
   //remove the video if it is within range
   if(index >= 0 && index < playlist.children.length)
     playlist.children[index].remove();
-
-  //update the border afterwards
-  updateBorder();
 }
 
 function deleteVideo(video)
 {
-  //get index
-  const index = queue.indexOf(video);
-
   //delete a video from the queue and the playlist
-  queue.splice(index, 1);
+  //and even enqueuedVideos if it exists
+
+  if(enqueuedVideos.includes(video))
+    enqueuedVideos.splice(enqueuedVideos.indexOf(video), 1);
+  queue.splice(queue.indexOf(video), 1);
   removeVideoFromPlaylist(index);
+
+  //update the border afterwards
+  updateBorder();
 }
 
 function generateVideos(video)
@@ -155,11 +159,7 @@ function generateVideos(video)
 
 function enqueueVideo(video)
 {
-  //sets the enqueuedVideo to the video's index and updates border
-  const index = queue.indexOf(video);
-
-  //stop if the index is equal to currentVideo, because that dont make sense
-  if(index == currentVideo) return;
+  //add video to enqueuedVideos, if it already exists, then remove it
 
   if(enqueuedVideos.includes(video)) {
     //remove the video from enqueuedVideos
