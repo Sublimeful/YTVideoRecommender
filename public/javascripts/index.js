@@ -79,8 +79,8 @@ function updateIndicators()
     const video = enqueuedVideos[i];
     const index = queue.indexOf(video);
     if(playlist.children[index]) {
-      playlist.children[index].style.border = `2px solid hsl(${hue}, 50%, 50%)`;
-      playlist.children[index].style.backgroundColor = `hsl(${hue}, 50%, 50%)`;
+      playlist.children[index].style.border = `2px solid hsl(${hue}, 100%, 50%)`;
+      playlist.children[index].style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
     }
   }
 }
