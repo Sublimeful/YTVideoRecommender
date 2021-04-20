@@ -176,8 +176,9 @@ function enqueueVideo(video)
 
 function addVideoToPlaylist(video)
 {
-  var videoTitle = video.videoTitle;
-  var videoThumb = video.videoThumb;
+  const videoTitle = video.videoTitle;
+  const videoThumb = video.videoThumb;
+  const videoUrl = video.videoUrl;
 
   const playlistEl = document.getElementById("playlist");
 
@@ -191,12 +192,19 @@ function addVideoToPlaylist(video)
 
   const titleEl = document.createElement("h1");
   titleEl.className = "video-title";
-  titleEl.textContent = videoTitle;
   titleEl.onclick = () => playVideo(video); 
+
+  const linkEl = document.createElement("a");
+  linkEl.href = videoUrl;
+  linkEl.textContent = videoTitle;
+  linkEl.style.pointerEvents = "none";
+  linkEl.style.color = "";
+  linkEl.style.textDecoration = "";
 
   playlistEl.appendChild(videoEl);
   videoEl.appendChild(thumbEl);
   videoEl.appendChild(titleEl);
+  titleEl.appendChild(linkEl);
 
   //mouseover event
   videoEl.addEventListener("mouseenter", () => {
