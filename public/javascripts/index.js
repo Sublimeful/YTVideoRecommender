@@ -28,7 +28,7 @@ function onPlayerStateChange(event) {
     //when video finishes
     //plays first enqueuedVideo if there is one
     if(enqueuedVideos.length > 0) {
-      playVideo(enqueuedVideos.shift());
+      playVideo(enqueuedVideos[0]);
       return;
     }
 
@@ -42,8 +42,7 @@ function onPlayerStateChange(event) {
     {
       //checks if queue even has something
       //if it does then play the first video
-      currentVideo = 0;
-      playVideo(queue[currentVideo]);
+      playVideo(queue[0]);
     }
     else
     {
@@ -69,9 +68,9 @@ function updateBorder()
   //colors the enqueuedVideos
   for(var i = 0; i < enqueuedVideos.length; i++)
   {
+    const hue = 30 * i % 360;
     const video = enqueuedVideos[i];
     const index = queue.indexOf(video);
-    const hue = 30 * i % 360;
     if(playlist.children[index]) {
       playlist.children[index].style.border = `2px solid hsl(${hue}, 50%, 50%)`;
     }
@@ -84,9 +83,8 @@ function playVideo(video)
   var index = queue.indexOf(video);
   currentVideo = index;
 
-  //remove from playlist and queue
-  removeVideoFromPlaylist(index);
-  queue.splice(index, 1);
+  //delete video
+  deleteVideo(video);
 
   //play the video
   player.loadVideoById(video.videoId);
@@ -94,27 +92,22 @@ function playVideo(video)
 
   //generates new videos
   generateVideos(video);
-
-  //update the border afterwards
-  updateBorder();
-}
-
-function removeVideoFromPlaylist(index)
-{
-  //remove the video if it is within range
-  if(index >= 0 && index < playlist.children.length)
-    playlist.children[index].remove();
 }
 
 function deleteVideo(video)
 {
-  //delete a video from the queue and the playlist
-  //and even enqueuedVideos if it exists
+  const index = queue.indexOf(video);
 
+  //delete from enqueuedVideos
   if(enqueuedVideos.includes(video))
     enqueuedVideos.splice(enqueuedVideos.indexOf(video), 1);
-  queue.splice(queue.indexOf(video), 1);
-  removeVideoFromPlaylist(index);
+
+  //delete from playlist
+  if(index >= 0 && index < playlist.children.length)
+    playlist.children[index].remove();
+
+  //delete from queue
+  queue.splice(index, 1);
 
   //update the border afterwards
   updateBorder();
