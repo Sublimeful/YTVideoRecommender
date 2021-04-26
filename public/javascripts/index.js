@@ -116,6 +116,9 @@ function deleteVideo(video)
 {
   const index = queue.indexOf(video);
 
+  //if the index does not exist then return;
+  if(index == -1) return;
+
   //delete from enqueuedVideos
   if(enqueuedVideos.includes(video))
     enqueuedVideos.splice(enqueuedVideos.indexOf(video), 1);
