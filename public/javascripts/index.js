@@ -149,7 +149,7 @@ function generateVideos(videoId)
   if(filterSeconds <= 0) return; 
 
 
-  fetch(`/get_recommended_videos/${videoId}`)
+  fetch(`/generator/${videoId}`)
   .then(res => res.json())
   .then(videos => {
     //filter videos based on seconds, skip if filterSeconds is NaN

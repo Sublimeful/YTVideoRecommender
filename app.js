@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '/index.html'));
 })
 
-app.get('/get_recommended_videos/:videoId', async (req, res) => {
+app.get('/generator/:videoId', async (req, res) => {
   const videoId = req.params["videoId"];
   const info = await ytdl.getBasicInfo(videoId);
 
