@@ -99,8 +99,7 @@ function updateIndicators()
 function playVideo(video)
 {
   //gets index and sets currentVideo
-  var index = queue.indexOf(video);
-  currentVideo = index;
+  currentVideo = queue.indexOf(video);
 
   //delete video
   deleteVideo(video);
