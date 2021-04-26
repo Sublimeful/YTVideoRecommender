@@ -149,7 +149,9 @@ function generateVideos(videoId)
   .then(res => res.json())
   .then(videos => {
     //filter videos, true if filterSeconds <= -1
-    videos = videos.filter(video => filterSeconds <= -1 || video.length_seconds <= filterSeconds);
+    videos = videos.filter(video => {
+      return (filterSeconds <= -1 || video.length_seconds <= filterSeconds)
+    });
 
     //gets the min between gennumber and returned array(otherwise out of bounds)
     const min = generateNumber < videos.length ? generateNumber : videos.length;
