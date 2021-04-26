@@ -2,12 +2,20 @@ const searchInput = document.getElementById("input-search");
 const generateInput = document.getElementById("input-generate");
 const playlist = document.getElementById("playlist");
 const searchAutoPlay = document.getElementById("search-autoplay")
+const filterSecondsInput = document.getElementById("filter-seconds")
 
 var queue = [];
 var addedVideos = new Set();
 var currentVideo = -1;
 var enqueuedVideos = [];
 var mouseOver = null;
+
+filterSecondsInput.onkeyup = event => {
+  if(event.code == "Enter" && searchInput.value)
+  {
+    searchVideo(searchInput.value);
+  }
+}
 
 searchInput.onkeyup = event => {
   if(event.code == "Enter" && searchInput.value)
@@ -24,9 +32,9 @@ generateInput.onkeyup = event => {
 }
 
 function onPlayerStateChange(event) {
+  //when the youtube video finishes
   if(event.data == 0)
   {
-    //when video finishes
     //plays first enqueuedVideo if there is one
     if(enqueuedVideos.length > 0) {
       playVideo(enqueuedVideos[0]);
@@ -56,6 +64,9 @@ function onPlayerStateChange(event) {
 
 function updateIndicators()
 {
+  //return if there is nothing in the playlist
+  if(playlist.children.length == 0) return;
+
   //remove all the borders from the playlist
   for(var i = 0; i < playlist.children.length; i++) {
     playlist.children[i].style.border = "";
@@ -95,11 +106,11 @@ function playVideo(video)
   deleteVideo(video);
 
   //play the video
-  player.loadVideoById(video.videoId);
+  player.loadVideoById(video.id);
   player.playVideo();
 
   //generates new videos
-  generateVideos(video);
+  generateVideos(video.id);
 }
 
 function deleteVideo(video)
@@ -121,64 +132,57 @@ function deleteVideo(video)
   updateIndicators();
 }
 
-function generateVideos(video)
+function generateVideos(videoId)
 {
-  //generate videos from video
+  //gets gennumber from input, defaults to a high number
+  var generateNumber = parseInt(generateInput.value);
+  if(isNaN(generateNumber)) generateNumber = 999;
 
-  //gets gennumber from input and checks to see if valid number
-  //if not valid then default to 5
-  var generateNumber = generateInput.value ? parseInt(generateInput.value) : 5;
-
-  //no point if generateNumber is 0 or lower, dont waste my resources
+  //no point if generateNumber is 0 or lower
   if(generateNumber <= 0) return; 
 
-  fetch(`/get_recommended_videos/${video.videoId}`)
+  var filterSeconds = parseInt(filterSecondsInput.value);
+  if(isNaN(filterSeconds)) filterSeconds = -1;
+
+
+  fetch(`/get_recommended_videos/${videoId}`)
   .then(res => res.json())
-  .then(json => {
+  .then(videos => {
+    //filter videos, true if filterSeconds <= -1
+    videos = videos.filter(video => filterSeconds <= -1 || video.length_seconds <= filterSeconds);
+
     //gets the min between gennumber and returned array(otherwise out of bounds)
-    const min = generateNumber < json.length ? generateNumber : json.length;
+    const min = generateNumber < videos.length ? generateNumber : videos.length;
 
-    for(var i = 0; i < min; i++)
-    {
-      const video = json[i];
-
-      if(!addedVideos.has(video.videoId))
+    for(var i = 0; i < min; i++) {
+      const video = videos[i];
+      if(!addedVideos.has(video.id))
       {
-        //if video hasnt been added before then add videoID to added videos
-        addedVideos.add(video.videoId); 
-
-        //add to playlist and queue
+        addedVideos.add(video.id); 
         addVideoToPlaylist(video);
         queue.push(video); 
       }
     }
 
-    //update the indicators afterwards
     updateIndicators();
   })
 }
 
 function enqueueVideo(video)
 {
-  //add video to enqueuedVideos, if it already exists, then remove it
-
-  if(enqueuedVideos.includes(video)) {
-    //remove the video from enqueuedVideos
+  if(enqueuedVideos.includes(video))
     enqueuedVideos.splice(enqueuedVideos.indexOf(video), 1);
-  } else {
-    //push the video into enqueuedVideos
+  else
     enqueuedVideos.push(video);
-  }
 
-  //update the indicators afterwards
   updateIndicators();
 }
 
 function addVideoToPlaylist(video)
 {
-  const videoTitle = video.videoTitle;
-  const videoThumb = video.videoThumb;
-  const videoUrl = video.videoUrl;
+  const videoTitle = video.title;
+  const videoThumb = video.thumbnails[video.thumbnails.length - 1].url;
+  const videoUrl = `https://youtu.be/${video.id}`;
 
   const playlistEl = document.getElementById("playlist");
 
@@ -207,7 +211,6 @@ function addVideoToPlaylist(video)
   videoEl.appendChild(linkEl);
   videoEl.appendChild(titleEl);
 
-  //mouseover event
   videoEl.addEventListener("mouseenter", () => {
     mouseOver = video;
   })
@@ -218,41 +221,21 @@ function addVideoToPlaylist(video)
 
 function searchVideo(url)
 {
-  //clear input
-  searchInput.value = "";
-
+  //check if url is youtube link, return otherwise
   const videoRegex = /(?<=^(https?\:\/\/)?(www.)?(youtube\.com\/watch\?v=|youtube\.com\/|youtu\.be\/))[A-z0-9_-]{11}/;
-  const match = url.match(videoRegex);
+  const match = url.match(videoRegex); if(!match) return;
+  const videoId = match[0];
 
-  if(match)
-  {
-    //checks whether url even matches regex
-    var video = {
-      videoId: "",
-      videoTitle: "",
-      videoUrl: "",
-      videoThumb: ""
-    };
-
-    //match[0] is id of video, because im smart
-    video.videoId = match[0];
-
-    //if searchAutoPlay is checked, then autoplay the video
-    if(searchAutoPlay.checked) {
-      //add videoID to added videos (order is important)
-      addedVideos.add(video.videoId);
-
-      //play video
-      player.loadVideoById(video.videoId);
-      player.playVideo();
-    }
-
-    //generate videos using just created video object
-    generateVideos(video);
+  if(searchAutoPlay.checked) {
+    //add videoID to addedVideos, then play video (order is important)
+    addedVideos.add(videoId);
+    player.loadVideoById(videoId);
+    player.playVideo();
   }
+
+  generateVideos(videoId);
 }
 
-//document key mouse over event
 document.addEventListener("keydown", event => {
   if(!mouseOver || document.activeElement == generateInput
                 || document.activeElement == searchInput) return;
