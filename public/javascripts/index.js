@@ -256,6 +256,8 @@ document.addEventListener("keydown", event => {
     case "KeyD":
       //delete video
       deleteVideo(mouseOver);
+      //when delete video, the element disappears, so set mouseOver to null
+      mouseOver = null;
       break;
   }
 })
