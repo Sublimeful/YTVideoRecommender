@@ -142,16 +142,20 @@ function generateVideos(videoId)
   if(generateNumber <= 0) return; 
 
   var filterSeconds = parseInt(filterSecondsInput.value);
-  if(isNaN(filterSeconds)) filterSeconds = -1;
+
+  //no point if filterSeconds is 0 or lower
+  if(filterSeconds <= 0) return; 
 
 
   fetch(`/get_recommended_videos/${videoId}`)
   .then(res => res.json())
   .then(videos => {
-    //filter videos, true if filterSeconds <= -1
-    videos = videos.filter(video => {
-      return (filterSeconds <= -1 || video.length_seconds <= filterSeconds)
-    });
+    //filter videos based on seconds, skip if filterSeconds is NaN
+    if(!isNaN(filterSeconds)) {
+      videos = videos.filter(video => {
+        return (video.length_seconds <= filterSeconds);
+      });
+    }
 
     //gets the min between gennumber and returned array(otherwise out of bounds)
     const min = generateNumber < videos.length ? generateNumber : videos.length;
