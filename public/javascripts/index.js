@@ -238,7 +238,8 @@ function searchVideo(url)
 
 document.addEventListener("keydown", event => {
   if(!mouseOver || document.activeElement == generateInput
-                || document.activeElement == searchInput) return;
+                || document.activeElement == searchInput
+                || document.activeElement == filterSecondsInput) return;
   switch(event.code) {
     case "KeyE":
       //enqueue video
